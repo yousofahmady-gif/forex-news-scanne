@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1120">
+<title>Forex News Scanner Pro</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#0b1120;
+  color:#e5e7eb;
+  font-family:Tahoma,Arial,sans-serif;
+  padding:16px;
+}
+.container{max-width:950px;margin:auto}
+h1{color:#38bdf8;font-size:23px}
+h2,h3{color:#cbd5e1}
+.card{
+  background:#151f32;
+  border:1px solid #29364d;
+  border-radius:12px;
+  padding:16px;
+  margin:14px 0;
+}
+label{display:block;margin:12px 0 6px;color:#cbd5e1}
+input,select,textarea,button{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #3b4b65;
+  background:#0b1425;
+  color:white;
+  font-size:15px;
+}
+button{
+  background:#0284c7;
+  border:0;
+  margin-top:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+button.secondary{background:#334155}
+button.danger{background:#991b1b}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.result{
+  padding:14px;
+  background:#0b1425;
+  border-radius:8px;
+  margin-top:10px;
+  line-height:2;
+  overflow-wrap:anywhere;
+}
+.green{color:#4ade80}
+.red{color:#fb7185}
+.yellow{color:#facc15}
+.small{
+  color:#94a3b8;
+  font-size:12px;
+  line-height:1.9;
+}
+.tablewrap{overflow-x:auto}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  min-width:650px;
+}
+th,td{
+  padding:9px;
+  border-bottom:1px solid #334155;
+  text-align:right;
+}
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:6px;
+  background:#26364d;
+}
+@media(max-width:520px){
+  .grid{grid-template-columns:1fr}
+  h1{font-size:20px}
+  body{padding:10px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>📊 Forex News Scanner Pro</h1>
+<p class="small">
+تحلیل دستی اخبار اقتصادی قرمز فارکس فکتوری |
+زمان خبر را بر اساس ساعت تهران وارد کن.
+</p>
+
+<div class="card">
+<h3>📝 ثبت خبر اقتصادی</h3>
+
+<label>ارز مربوط به خبر</label>
+<select id="currency">
+<option value="USD">USD - دلار آمریکا</option>
+<option value="EUR">EUR - یورو</option>
+<option value="GBP">GBP - پوند انگلیس</option>
+<option value="JPY">JPY - ین ژاپن</option>
+<option value="CHF">CHF - فرانک سوئیس</option>
+<option value="CAD">CAD - دلار کانادا</option>
+<option value="AUD">AUD - دلار استرالیا</option>
+<option value="NZD">NZD - دلار نیوزیلند</option>
+</select>
+
+<label>عنوان اصلی انگلیسی خبر</label>
+<input id="title" placeholder="مثلاً CPI y/y">
+
+<div class="grid">
+<div>
+<label>تاریخ خبر</label>
+<input id="date" type="date">
+</div>
+<div>
+<label>ساعت تهران</label>
+<input id="time" type="time">
+</div>
+</div>
+
+<div class="grid">
+<div>
+<label>Previous (عدد قبلی)</label>
+<input id="previous" type="number" step="any" placeholder="مثلاً 2.9">
+</div>
+<div>
+<label>Forecast (پیش‌بینی)</label>
+<input id="forecast" type="number" step="any" placeholder="مثلاً 3.1">
+</div>
+</div>
+
+<label>Actual (عدد واقعی پس از انتشار)</label>
+<input id="actual" type="number" step="any" placeholder="اختیاری">
+
+<label>اهمیت خبر</label>
+<select id="importance">
+<option value="قرمز">🔴 قرمز - اهمیت بالا</option>
+<option value="نارنجی">🟠 نارنجی - اهمیت متوسط</option>
+<option value="زرد">🟡 زرد - اهمیت پایین</option>
+</select>
+
+<label>قاعده تفسیر خبر</label>
+<select id="direction">
+<option value="higher">عدد بالاتر معمولاً به نفع ارز است</option>
+<option value="lower">عدد پایین‌تر معمولاً به نفع ارز است</option>
+<option value="manual">جهت اثر را دستی تعیین می‌کنم</option>
+</select>
+
+<label>جهت اثر بنیادی مورد انتظار</label>
+<select id="manualDirection">
+<option value="positive">مثبت برای ارز خبر</option>
+<option value="negative">منفی برای ارز خبر</option>
+<option value="neutral">خنثی یا نامشخص</option>
+</select>
+
+<label>یادداشت و تحلیل شخصی</label>
+<textarea id="notes" rows="3"
+placeholder="مثلاً انتظار بازار، وضعیت دلار، سخنرانی فدرال رزرو و..."></textarea>
+
+<button onclick="analyze()">تحلیل و ذخیره خبر</button>
+<button class="secondary" onclick="resetForm()">پاک کردن فرم</button>
+</div>
+
+<div class="card">
+<h3>📈 نتیجه تحلیل</h3>
+<div id="result" class="result">
+اطلاعات خبر را وارد کن و روی تحلیل بزن.
+</div>
+</div>
+
+<div class="card">
+<h3>📚 خبرهای ذخیره‌شده</h3>
+
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>تاریخ</th>
+<th>ساعت</th>
+<th>ارز</th>
+<th>عنوان خبر</th>
+<th>Forecast − Previous</th>
+<th>Actual − Forecast</th>
+<th>جهت انتخابی</th>
+<th>حذف</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+
+<button class="secondary" onclick="exportCSV()">دانلود خروجی CSV</button>
+<button class="secondary" onclick="exportJSON()">پشتیبان JSON</button>
+<button class="danger" onclick="clearAll()">حذف همه خبرها</button>
+
+<p class="small">
+اطلاعات در حافظه مرورگر همین دستگاه ذخیره می‌شوند.
+برای نگهداری دائمی، از خروجی CSV یا پشتیبان JSON استفاده کن.
+</p>
+</div>
+
+<div class="card">
+<h3>⚠️ راهنمای تفسیر</h3>
+<p class="small">
+اختلاف Forecast و Previous نشان می‌دهد پیش‌بینی نسبت به مقدار قبلی
+چقدر تغییر کرده است. این اختلاف به‌تنهایی اثر واقعی خبر را مشخص نمی‌کند.
+پس از انتشار، Actual را با Forecast مقایسه کن.
+برای تفسیر صحیح باید نوع شاخص اقتصادی و شرایط بازار نیز بررسی شود.
+</p>
+<p class="small">
+این برنامه ابزار تحلیل و ثبت اطلاعات است، نه پیش‌بینی قطعی قیمت
+و نه توصیه خرید یا فروش.
+</p>
+</div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let events = [];
+
+try {
+  events = JSON.parse(
+    localStorage.getItem("forexNewsScannerEvents") || "[]"
+  );
+
+  if (!Array.isArray(events)) events = [];
+} catch(e) {
+  events = [];
+}
+
+function persist() {
+  try {
+    localStorage.setItem(
+      "forexNewsScannerEvents",
+      JSON.stringify(events)
+    );
+    return true;
+  } catch(e) {
+    alert("ذخیره‌سازی مرورگر انجام نشد. از خروجی JSON استفاده کن.");
+    return false;
+  }
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function(c) {
+    return {
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c];
+  });
+}
+
+function getBias(currency, direction, manual, diff) {
+  if (direction === "manual") return manual;
+
+  if (diff === 0) return "neutral";
+
+  const higherFavorsCurrency = direction === "higher";
+
+  return (
+    (diff > 0) === higherFavorsCurrency
+  ) ? "positive" : "negative";
+}
+
+function analyze() {
+  const currency = $("currency").value;
+  const title = $("title").value.trim();
+  const date = $("date").value;
+  const time = $("time").value;
+  const pText = $("previous").value.trim();
+  const fText = $("forecast").value.trim();
+  const aText = $("actual").value.trim();
+
+  const p = Number(pText);
+  const f = Number(fText);
+  const a = Number(aText);
+
+  const direction = $("direction").value;
+  const manual = $("manualDirection").value;
+  const importance = $("importance").value;
+  const notes = $("notes").value.trim();
+
+  if (!title) {
+    alert("عنوان خبر را وارد کن.");
+    return;
+  }
+
+  if (
+    pText === "" || fText === "" ||
+    !Number.isFinite(p) || !Number.isFinite(f)
+  ) {
+    alert("مقادیر معتبر Previous و Forecast را وارد کن.");
+    return;
+  }
+
+  const diff = f - p;
+
+  const hasActual =
+    aText !== "" && Number.isFinite(a);
+
+  const actualDiff = hasActual ? a - f : null;
+
+  const bias = getBias(
+    currency, direction, manual, diff
+  );
+
+  let biasText = "";
+  let biasClass = "";
+
+  if (bias === "positive") {
+    biasText = "مثبت برای ارز مربوط به خبر";
+    biasClass = "green";
+  } else if (bias === "negative") {
+    biasText = "منفی برای ارز مربوط به خبر";
+    biasClass = "red";
+  } else {
+    biasText = "خنثی یا نامشخص";
+    biasClass = "yellow";
+  }
+
+  let actualText = "هنوز مقدار Actual وارد نشده است.";
+
+  if (hasActual) {
+    if (actualDiff > 0) {
+      actualText =
+        "Actual بالاتر از Forecast است (اختلاف مثبت).";
+    } else if (actualDiff < 0) {
+      actualText =
+        "Actual پایین‌تر از Forecast است (اختلاف منفی).";
+    } else {
+      actualText =
+        "Actual دقیقاً برابر Forecast است.";
+    }
+  }
+
+  const pairs = {
+    USD: ["EURUSD","GBPUSD","AUDUSD","NZDUSD",
+          "USDJPY","USDCHF","USDCAD","XAUUSD"],
+    EUR: ["EURUSD","EURGBP","EURJPY","EURCHF"],
+    GBP: ["GBPUSD","EURGBP","GBPJPY"],
+    JPY: ["USDJPY","EURJPY","GBPJPY"],
+    CHF: ["USDCHF","EURCHF"],
+    CAD: ["USDCAD","CADJPY"],
+    AUD: ["AUDUSD","AUDJPY"],
+    NZD: ["NZDUSD","NZDJPY"]
+  };
+
+  let pairExplanation = "";
+
+  if (bias === "positive") {
+    if (currency === "USD") {
+      pairExplanation =
+        "تقویت احتمالی USD می‌تواند EURUSD و GBPUSD را تحت فشار نزولی " +
+        "و USDJPY و USDCHF را تحت فشار صعودی قرار دهد.";
+    } else {
+      pairExplanation =
+        "تقویت احتمالی ارز خبر ممکن است آن را در برابر ارز مقابل " +
+        "قوی‌تر کند؛ جهت دقیق به جفت‌ارز انتخابی بستگی دارد.";
+    }
+  } else if (bias === "negative") {
+    if (currency === "USD") {
+      pairExplanation =
+        "تضعیف احتمالی USD می‌تواند EURUSD و GBPUSD را تقویت " +
+        "و USDJPY و USDCHF را تضعیف کند.";
+    } else {
+      pairExplanation =
+        "تضعیف احتمالی ارز خبر ممکن است آن را در برابر ارز مقابل " +
+        "ضعیف‌تر کند؛ جهت دقیق به جفت‌ارز انتخابی بستگی دارد.";
+    }
+  } else {
+    pairExplanation =
+      "جهت مشخصی قابل نتیجه‌گیری نیست؛ شرایط بازار را بررسی کن.";
+  }
+
+  $("result").innerHTML =
+    "<b>" + escapeHTML(title) + "</b><br>" +
+    "ارز خبر: <span class='badge'>" +
+    escapeHTML(currency) + "</span><br>" +
+    "اهمیت: " + escapeHTML(importance) + "<br>" +
+    "Forecast − Previous: <span class='yellow'>" +
+    diff.toFixed(6) + "</span><br>" +
+    "جهت اثر انتخابی: <b class='" + biasClass + "'>" +
+    escapeHTML(biasText) + "</b><br>" +
+    "<hr>" +
+    "<b>پس از انتشار:</b><br>" +
+    escapeHTML(actualText) +
+    (hasActual
+      ? "<br>Actual − Forecast: <span class='yellow'>" +
+        actualDiff.toFixed(6) + "</span>"
+      : "") +
+    "<hr>" +
+    "<b>جفت‌ارزهای مرتبط:</b><br>" +
+    escapeHTML((pairs[currency] || []).join("، ")) +
+    "<br><br>" +
+    escapeHTML(pairExplanation) +
+    (notes
+      ? "<br><br><b>یادداشت:</b><br>" + escapeHTML(notes)
+      : "");
+
+  events.unshift({
+    id: Date.now() + Math.random(),
+    date: date,
+    time: time,
+    currency: currency,
+    title: title,
+    importance: importance,
+    previous: p,
+    forecast: f,
+    actual: hasActual ? a : "",
+    diff: diff,
+    actualDiff: hasActual ? actualDiff : "",
+    bias: bias,
+    notes: notes
+  });
+
+  persist();
+  render();
+}
+
+function render() {
+  $("rows").innerHTML = events.map(function(e, i) {
+    return "<tr>" +
+      "<td>" + escapeHTML(e.date || "") + "</td>" +
+      "<td>" + escapeHTML(e.time || "") + "</td>" +
+      "<td>" + escapeHTML(e.currency || "") + "</td>" +
+      "<td>" + escapeHTML(e.title || "") + "</td>" +
+      "<td>" + Number(e.diff || 0).toFixed(4) + "</td>" +
+      "<td>" +
+        (e.actualDiff === "" || e.actualDiff == null
+          ? "—"
+          : Number(e.actualDiff).toFixed(4)) +
+      "</td>" +
+      "<td>" + escapeHTML(e.bias || "") + "</td>" +
+      "<td><button class='danger' onclick='removeEvent(" +
+        i + ")'>حذف</button></td>" +
+      "</tr>";
+  }).join("");
+}
+
+function removeEvent(i) {
+  if (!confirm("این خبر حذف شود؟")) return;
+  events.splice(i, 1);
+  persist();
+  render();
+}
+
+function clearAll() {
+  if (!confirm("همه خبرهای ذخیره‌شده حذف شوند؟")) return;
+  events = [];
+  persist();
+  render();
+  $("result").textContent = "همه خبرها حذف شدند.";
+}
+
+function resetForm() {
+  $("title").value = "";
+  $("previous").value = "";
+  $("forecast").value = "";
+  $("actual").value = "";
+  $("notes").value = "";
+  $("result").textContent = "اطلاعات خبر را وارد کن.";
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], {type:type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(function() {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+function exportCSV() {
+  const headers = [
+    "date","time","currency","title","importance",
+    "previous","forecast","actual","diff",
+    "actualDiff","bias","notes"
+  ];
+
+  const lines = [headers.join(",")];
+
+  events.forEach(function(e) {
+    lines.push(headers.map(function(k) {
+      return '"' +
+        String(e[k] ?? "").replace(/"/g, '""') +
+        '"';
+    }).join(","));
+  });
+
+  downloadFile(
+    "\uFEFF" + lines.join("\r\n"),
+    "forex-news-scanner.csv",
+    "text/csv;charset=utf-8;"
+  );
+}
+
+function exportJSON() {
+  downloadFile(
+    JSON.stringify(events, null, 2),
+    "forex-news-backup.json",
+    "application/json;charset=utf-8;"
+  );
+}
+
+function setDefaultDate() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tehran",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const values = {};
+  parts.forEach(function(p) {
+    values[p.type] = p.value;
+  });
+
+  $("date").value =
+    values.year + "-" + values.month + "-" + values.day;
+
+  const timeParts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Tehran",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date());
+
+  const t = {};
+  timeParts.forEach(function(p) {
+    t[p.type] = p.value;
+  });
+
+  $("time").value = t.hour + ":" + t.minute;
+}
+
+setDefaultDate();
+render();
+</script>
+
+</body>
+</html>
